@@ -19,14 +19,14 @@ jobs:
       - name: Qiita CLIのインストール
         run: npm install -g @qiita/qiita-cli
 
-      - name: 環境変数の設定
+      - name: 認証情報の設定
         env:
           QIITA_ACCESS_TOKEN: ${{ secrets.QIITA_ACCESS_TOKEN }}
-        run: echo "アクセストークンが設定されました"
+        run: |
+          mkdir -p ~/.config/qiita-cli
+          echo '{"access_token": "'"$QIITA_ACCESS_TOKEN"'"}' > ~/.config/qiita-cli/credentials.json
 
       - name: 記事の投稿・更新
-        env:
-          QIITA_ACCESS_TOKEN: ${{ secrets.QIITA_ACCESS_TOKEN }}
         run: |
           for file in public/*.md; do
             qiita publish "$(basename "$file" .md)"
