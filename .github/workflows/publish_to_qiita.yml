@@ -1,0 +1,31 @@
+name: Publish to Qiita
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリのチェックアウト
+        uses: actions/checkout@v3
+
+      - name: Node.jsのセットアップ
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Qiita CLIのインストール
+        run: npm install -g @qiita/qiita-cli
+
+      - name: Qiita CLIのログイン
+        env:
+          QIITA_ACCESS_TOKEN: ${{ secrets.QIITA_ACCESS_TOKEN }}
+        run: qiita login --token $QIITA_ACCESS_TOKEN
+
+      - name: 記事の投稿・更新
+        run: |
+          for file in public/*.md; do
+            qiita publish "$(basename "$file" .md)"
+          done
